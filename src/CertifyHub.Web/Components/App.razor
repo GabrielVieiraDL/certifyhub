@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CertifyHub" />
+    <meta name="theme-color" content="#0078d4" />
+    <base href="/" />
+    <ResourcePreloader />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["CertifyHub.Web.styles.css"]" />
+    <ImportMap />
+    <HeadOutlet @rendermode="InteractiveServer" />
+    <style>
+        :root {
+            color-scheme: light;
+        }
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh !important;
+            background-color: #f1f5f9 !important;
+            color: #1e293b !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <ReconnectModal />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>

@@ -1,0 +1,687 @@
+/* Reset e Normalização Total */
+html {
+    background-color: #f1f5f9 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e2e8f0;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0078d4;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f1f5f9 !important;
+    width: 100%;
+}
+
+/* Header Microsoft Azure */
+.navbar-header {
+    background-color: #0078d4;
+    color: #ffffff;
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.brand-badge {
+    background-color: #004578;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.brand-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+}
+
+.brand-sub {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    padding-left: 0.6rem;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.nav-item, .nav-item-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.nav-item:hover, .nav-item-link:hover {
+    opacity: 0.8;
+}
+
+/* Conteúdo Central Responsivo */
+.content-body {
+    flex: 1 0 auto;
+    max-width: 960px;
+    width: 100%;
+    margin: 1.5rem auto 3.5rem auto;
+    padding: 0 1rem;
+}
+
+/* Footer Fixado e Bem Visível com Safe Area para Mobile */
+.footer-container {
+    flex-shrink: 0;
+    background-color: #ffffff;
+    border-top: 1px solid #cbd5e1;
+    padding: 1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #475569;
+    width: 100%;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.footer-text {
+    margin: 0 0 0.35rem 0;
+    line-height: 1.4;
+}
+
+.footer-subtext {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Card Container */
+.card-box {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 640px) {
+    .navbar-header {
+        padding: 0.65rem 0.85rem;
+    }
+    .brand-title {
+        font-size: 1.15rem;
+    }
+    .brand-badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+    }
+    .brand-sub {
+        display: none !important;
+    }
+    .nav-links {
+        gap: 0.5rem;
+    }
+    .nav-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.82rem;
+    }
+    .nav-item-link {
+        display: none !important; /* Oculta link externo no celular para não quebrar a barra */
+    }
+    .card-box {
+        padding: 1.15rem 0.85rem;
+        border-radius: 10px;
+    }
+    .content-body {
+        margin: 0.75rem auto 3rem auto;
+        padding: 0 0.5rem;
+    }
+}
+
+/* Badges */
+.badge-domain {
+    display: inline-block;
+    background-color: #eff6fc;
+    color: #0078d4;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    margin-bottom: 0.85rem;
+    border: 1px solid #bfdbfe;
+}
+
+.badge-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    letter-spacing: 0.01em;
+}
+
+.badge-type.single {
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.badge-type.multiple {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+    border: 1px solid #ddd6fe;
+    box-shadow: 0 1px 2px rgba(124, 58, 237, 0.08);
+}
+
+/* Indicadores Visuais de Seleção (Radio / Checkbox) */
+.selector-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    transition: all 0.15s ease;
+}
+
+.selector-icon.radio {
+    border-radius: 50%;
+    border: 2px solid #94a3b8;
+    background: #ffffff;
+}
+
+.selector-icon.radio.checked {
+    border-color: #0078d4;
+    background: #ffffff;
+    position: relative;
+}
+
+.selector-icon.radio.checked::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0078d4;
+    display: block;
+}
+
+.selector-icon.checkbox {
+    border-radius: 4px;
+    border: 2px solid #94a3b8;
+    background: #ffffff;
+}
+
+.selector-icon.checkbox.checked {
+    border-color: #7c3aed;
+    background: #7c3aed;
+    position: relative;
+}
+
+.selector-icon.checkbox.checked::after {
+    content: "✓";
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+    color: #ffffff;
+}
+
+/* Opções de Resposta */
+.option-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.option-item:hover {
+    background-color: #f8fafc;
+    border-color: #93c5fd;
+    transform: translateY(-1px);
+}
+
+.option-item.selected {
+    background-color: #eff6fc;
+    border-color: #0078d4;
+    font-weight: 600;
+}
+
+.option-item.selected-multi {
+    background-color: #fbf7ff;
+    border-color: #7c3aed;
+    font-weight: 600;
+}
+
+.option-item.correct {
+    background-color: #ecfdf5;
+    border-color: #10b981;
+}
+
+.option-item.feedback-correct-missed {
+    background-color: #fffbeb;
+    border-color: #f59e0b;
+    border-style: dashed;
+}
+
+.option-item.incorrect {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
+
+.option-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.option-letter {
+    font-weight: 700;
+    min-width: 24px;
+    flex-shrink: 0;
+}
+
+.option-text {
+    line-height: 1.45;
+    word-break: break-word;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+/* Badges de Feedback das Opções */
+.feedback-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    line-height: 1.3;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.feedback-badge.badge-correct {
+    color: #065f46;
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+}
+
+.feedback-badge.badge-missed {
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+}
+
+.feedback-badge.badge-incorrect {
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+}
+
+/* Barra de Ações e Navegação Inferior */
+.action-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.action-toolbar-counter {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    padding: 0.45rem 1.1rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+}
+
+.action-toolbar-group {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+}
+
+@media (max-width: 640px) {
+    .action-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        padding-top: 1rem;
+    }
+    
+    .action-toolbar-counter {
+        width: 100%;
+        text-align: center;
+        order: -1;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.82rem;
+    }
+    
+    .action-toolbar-group {
+        display: flex;
+        width: 100%;
+        gap: 0.5rem;
+    }
+    
+    .action-toolbar-group .btn {
+        flex: 1 1 50%;
+        padding: 0.65rem 0.5rem;
+        font-size: 0.85rem;
+        justify-content: center;
+    }
+}
+
+/* Header do Modo Estudo e Exame */
+.session-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+}
+
+.session-header-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+
+.instructor-badge {
+    font-size: 0.85rem;
+    color: #059669;
+    font-weight: 700;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .session-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.85rem;
+    }
+    .instructor-badge {
+        align-self: flex-start;
+        font-size: 0.78rem;
+        padding: 0.3rem 0.65rem;
+    }
+}
+
+/* Banners */
+.feedback-banner {
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin-top: 1.25rem;
+}
+
+.feedback-banner.success {
+    background-color: #ecfdf5;
+    border-left: 4px solid #10b981;
+}
+
+.feedback-banner.error {
+    background-color: #fef2f2;
+    border-left: 4px solid #ef4444;
+}
+
+/* ==========================================================================
+   DESIGN SYSTEM DE BOTÕES — CERTIFYHUB (UI/UX PROFISSIONAL MICROSOFT AZURE)
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.35rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.4;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.btn:focus-visible {
+    outline: 2px solid #0078d4;
+    outline-offset: 2px;
+}
+
+/* 1. Botão Primário Azul Azure */
+.btn-primary {
+    background-color: #0078d4 !important;
+    color: #ffffff !important;
+    border-color: #0078d4 !important;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #106ebe !important;
+    border-color: #106ebe !important;
+    box-shadow: 0 4px 10px rgba(0, 120, 212, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 2. Botão Secundário / Contorno Slate */
+.btn-secondary, .btn-outline {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+}
+
+.btn-secondary:hover:not(:disabled), .btn-outline:hover:not(:disabled) {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #0078d4 !important;
+}
+
+/* 3. Botão Sucesso Verde Esmeralda (Finalizar, Treinamento Comentado, Conclusão) */
+.btn-success {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+    border-color: #059669 !important;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #047857 !important;
+    border-color: #047857 !important;
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 4. Botão Âmbar / Laranja (AZ-104 Associate) */
+.btn-amber {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    border-color: #d97706 !important;
+}
+
+.btn-amber:hover:not(:disabled) {
+    background-color: #b45309 !important;
+    border-color: #b45309 !important;
+    box-shadow: 0 4px 10px rgba(217, 119, 6, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 5. Botão de Verificação (Modo Estudo: Verificar Resposta) */
+.btn-verify {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+    font-weight: 700;
+}
+
+.btn-verify:hover:not(:disabled) {
+    background-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+    color: #ffffff !important;
+}
+
+/* 6. Botão Outline Verde */
+.btn-outline-success {
+    background-color: #ffffff !important;
+    color: #059669 !important;
+    border-color: #10b981 !important;
+}
+
+.btn-outline-success:hover:not(:disabled) {
+    background-color: #ecfdf5 !important;
+    border-color: #059669 !important;
+    color: #047857 !important;
+}
+
+/* 7. Estado Desabilitado Universal */
+.btn:disabled, .btn[disabled] {
+    opacity: 0.65 !important;
+    cursor: not-allowed !important;
+    background-color: #f1f5f9 !important;
+    color: #94a3b8 !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Modificadores de Tamanho e Layout */
+.btn-block {
+    width: 100%;
+}
+
+.btn-lg {
+    padding: 0.85rem 1.6rem;
+    font-size: 1rem;
+    border-radius: 9px;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.82rem;
+    border-radius: 6px;
+}
+
+/* Botões do Mapa de Questões */
+.map-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Fallback para componentes Fluent UI caso presentes */
+fluent-button {
+    color: #1e293b;
+    font-family: inherit;
+    display: inline-block;
+}
+
+fluent-button::part(control) {
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all 0.15s ease;
+}

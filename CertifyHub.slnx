@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CertifyHub.Api/CertifyHub.Api.csproj" />
+    <Project Path="src/CertifyHub.Domain/CertifyHub.Domain.csproj" />
+    <Project Path="src/CertifyHub.Infrastructure/CertifyHub.Infrastructure.csproj" />
+    <Project Path="src/CertifyHub.Web/CertifyHub.Web.csproj" />
+  </Folder>
+</Solution>

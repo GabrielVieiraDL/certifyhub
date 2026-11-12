@@ -1,0 +1,18 @@
+## .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+
+## Tools & temporary files
+tools/
+*.log
+.vs/
+.vscode/

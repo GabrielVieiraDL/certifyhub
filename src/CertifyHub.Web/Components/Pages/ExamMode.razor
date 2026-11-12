@@ -1,0 +1,249 @@
+@page "/exam-session/{SessionId:guid}"
+@inject ExamApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>Modo Exame AZ-900 — CertifyHub</PageTitle>
+
+@if (loading)
+{
+    <div class="card-box" style="text-align: center; padding: 4rem;">
+        <FluentSpinner />
+        <p style="margin-top: 1rem; color: #64748b; font-weight: 600;">Carregando simulado oficial (50 questões)...</p>
+    </div>
+}
+else if (questions.Count == 0)
+{
+    <div class="card-box" style="text-align: center; padding: 3rem;">
+        <p style="font-size: 1.1rem; color: #ef4444; font-weight: 600;">Não foi possível carregar as questões deste exame.</p>
+        <button type="button" class="btn btn-primary" @onclick='() => Nav.NavigateTo("/")' style="margin-top: 1rem;">
+            Voltar ao Início
+        </button>
+    </div>
+}
+else
+{
+    var currentQ = questions[currentIndex];
+    var isAnswered = userAnswers.ContainsKey(currentQ.Id);
+
+    <!-- Header do Exame com Domínio e Cronômetro Regressivo -->
+    <div class="session-header">
+        <div>
+            <div class="session-header-badges">
+                <span class="badge-domain" style="margin-bottom: 0;">@currentQ.DomainName</span>
+                @if (currentQ.Type == QuestionType.MultipleChoice)
+                {
+                    <span class="badge-type multiple">☑️ Múltipla Escolha (Selecione todas as opções corretas)</span>
+                }
+                else
+                {
+                    <span class="badge-type single">🔘 Escolha Única (Selecione 1 opção)</span>
+                }
+            </div>
+            <h2 style="font-size: 1.25rem; font-weight: 700; color: #1e293b; margin: 0.25rem 0 0 0;">
+                Questão @(currentIndex + 1) de @questions.Count
+            </h2>
+        </div>
+        <div>
+            <ExamTimer ExpiresAt="@session?.ExpiresAt" OnTimeExpired="HandleTimeExpired" />
+        </div>
+    </div>
+
+    <!-- Card Principal da Questão -->
+    <div class="card-box">
+        @if (currentQ.Type == QuestionType.MultipleChoice)
+        {
+            var count = userAnswers.TryGetValue(currentQ.Id, out var sList) ? sList.Count : 0;
+            <div style="margin-bottom: 1.25rem; font-size: 0.88rem; font-weight: 600; color: #6d28d9; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 0.55rem 0.9rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <span>ℹ️ <strong>Múltipla Seleção:</strong> Marque todas as alternativas que atendem aos requisitos. (@count selecionada@(count == 1 ? "" : "s"))</span>
+            </div>
+        }
+
+        <p style="font-size: 1.05rem; line-height: 1.6; color: #1e293b; margin-bottom: 1.5rem; font-weight: 500;">
+            @currentQ.Statement
+        </p>
+
+        <!-- Alternativas -->
+        <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.75rem;">
+            @foreach (var opt in currentQ.Options)
+            {
+                var isSelected = userAnswers.TryGetValue(currentQ.Id, out var selectedList) && selectedList.Contains(opt.Id);
+                var isMulti = currentQ.Type == QuestionType.MultipleChoice;
+                var itemClass = "option-item";
+                if (isSelected)
+                {
+                    itemClass += isMulti ? " selected-multi" : " selected";
+                }
+
+                <div class="@itemClass" @onclick="() => ToggleOption(currentQ.Id, opt.Id, currentQ.Type)">
+                    <div class="selector-icon @(isMulti ? "checkbox" : "radio") @(isSelected ? "checked" : "")"></div>
+                    <span class="option-letter" style="color: @(isMulti ? "#7c3aed" : "#0078d4");">@opt.Letter)</span>
+                    <div class="option-body">
+                        <div class="option-text">@opt.Text</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Barra de Ações e Navegação Principal -->
+        <div class="action-toolbar">
+            <button type="button"
+                    class="btn btn-secondary"
+                    disabled="@(currentIndex == 0)"
+                    @onclick="PreviousQuestion">
+                ← Anterior
+            </button>
+
+            <div class="action-toolbar-counter">
+                📝 @(userAnswers.Count) de @questions.Count Respondidas
+            </div>
+
+            <div class="action-toolbar-group">
+                @if (currentIndex < questions.Count - 1)
+                {
+                    <button type="button"
+                            class="btn btn-primary"
+                            @onclick="NextQuestion">
+                        Próxima →
+                    </button>
+                }
+
+                <button type="button"
+                        class="btn @(currentIndex == questions.Count - 1 ? "btn-success" : "btn-secondary")"
+                        disabled="@submitting"
+                        @onclick="FinalizarExame">
+                    @(submitting ? "Finalizando..." : "Finalizar Exame 🏁")
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mapa de Questões (Navegação Rápida entre as 50 Questões) -->
+    <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-weight: 700; font-size: 0.95rem; color: #1e293b;">
+                🗺️ Mapa de Questões (@userAnswers.Count de @questions.Count respondidas)
+            </span>
+            <div style="display: flex; gap: 1rem; font-size: 0.78rem; color: #64748b; flex-wrap: wrap;">
+                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="width: 12px; height: 12px; background: #0078d4; border-radius: 3px; display: inline-block;"></span> Atual
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="width: 12px; height: 12px; background: #dbeafe; border: 1px solid #93c5fd; border-radius: 3px; display: inline-block;"></span> Respondida
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span style="width: 12px; height: 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 3px; display: inline-block;"></span> Não respondida
+                </span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 0.4rem;">
+            @for (int i = 0; i < questions.Count; i++)
+            {
+                var index = i;
+                var answered = userAnswers.ContainsKey(questions[i].Id);
+                var isCurrent = i == currentIndex;
+
+                var bg = isCurrent ? "#0078d4" : (answered ? "#dbeafe" : "#ffffff");
+                var border = isCurrent ? "#0078d4" : (answered ? "#93c5fd" : "#cbd5e1");
+                var color = isCurrent ? "#ffffff" : (answered ? "#1e40af" : "#475569");
+
+                <button type="button"
+                        class="map-btn"
+                        @onclick="() => currentIndex = index"
+                        style="height: 36px; border-radius: 6px; border: 1.5px solid @border; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+                               background-color: @bg; color: @color; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center;"
+                        title="Ir para questão @(i + 1)">
+                    @(i + 1)
+                </button>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid SessionId { get; set; }
+
+    private bool loading = true;
+    private bool submitting = false;
+    private ExamSessionDto? session;
+    private List<QuestionDto> questions = [];
+    private int currentIndex = 0;
+    private Dictionary<Guid, List<Guid>> userAnswers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        session = await Api.GetSessionAsync(SessionId);
+        if (session is null)
+        {
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        questions = await Api.GetSessionQuestionsAsync(SessionId);
+        loading = false;
+    }
+
+    private void ToggleOption(Guid questionId, Guid optionId, QuestionType type)
+    {
+        if (type == QuestionType.MultipleChoice)
+        {
+            if (!userAnswers.TryGetValue(questionId, out var list))
+            {
+                userAnswers[questionId] = [optionId];
+            }
+            else
+            {
+                if (list.Contains(optionId))
+                {
+                    list.Remove(optionId);
+                    if (list.Count == 0)
+                    {
+                        userAnswers.Remove(questionId);
+                    }
+                }
+                else
+                {
+                    list.Add(optionId);
+                }
+            }
+        }
+        else
+        {
+            userAnswers[questionId] = [optionId];
+        }
+    }
+
+    private void NextQuestion()
+    {
+        if (currentIndex < questions.Count - 1)
+            currentIndex++;
+    }
+
+    private void PreviousQuestion()
+    {
+        if (currentIndex > 0)
+            currentIndex--;
+    }
+
+    private async Task FinalizarExame()
+    {
+        submitting = true;
+
+        foreach (var (qId, optIds) in userAnswers)
+        {
+            await Api.SubmitAnswerAsync(SessionId, qId, optIds);
+        }
+
+        var success = await Api.FinishExamAsync(SessionId);
+        if (success)
+        {
+            Nav.NavigateTo($"/result/{SessionId}");
+        }
+        submitting = false;
+    }
+
+    private void HandleTimeExpired()
+    {
+        _ = FinalizarExame();
+    }
+}

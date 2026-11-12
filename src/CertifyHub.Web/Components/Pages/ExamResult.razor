@@ -1,0 +1,249 @@
+@page "/result/{SessionId:guid}"
+@inject ExamApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>Resultado Oficial — CertifyHub</PageTitle>
+
+@if (loading)
+{
+    <div class="card-box" style="text-align: center; padding: 4rem;">
+        <FluentSpinner />
+        <p style="margin-top: 1rem; color: #6b7280;">Calculando pontuação e desempenho por domínio...</p>
+    </div>
+}
+else if (result is null)
+{
+    <div class="card-box" style="text-align: center; padding: 3rem;">
+        <p style="color: #ef4444; font-weight: 700; font-size: 1.1rem;">Não foi possível carregar os resultados.</p>
+        <button type="button" class="btn btn-primary" @onclick='() => Nav.NavigateTo("/")' style="margin-top: 1rem;">
+            Voltar ao Início
+        </button>
+    </div>
+}
+else
+{
+    <!-- Placar Principal de Aprovação -->
+    <div class="card-box" style="text-align: center; padding: 3rem 2rem; border-top: 6px solid @(result.Passed ? "#10b981" : "#ef4444");">
+        <span style="font-size: 3rem;">@(result.Passed ? "🏆" : "📑")</span>
+        <h1 style="font-size: 2rem; font-weight: 800; color: @(result.Passed ? "#065f46" : "#991b1b"); margin: 0.5rem 0;">
+            @(result.Passed ? $"APROVADO NO EXAME {result.ExamCode}!" : "NÃO FOI DESTA VEZ")
+        </h1>
+        <p style="color: #6b7280; font-size: 1rem; margin-bottom: 2rem;">
+            @(result.Passed ? "Parabéns! Sua pontuação superou a nota de corte oficial da Microsoft (700 pontos)." : "Continue estudando os domínios abaixo para atingir a nota mínima de 700 pontos.")
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem 2rem;">
+                <div style="font-size: 2.25rem; font-weight: 800; color: @(result.Passed ? "#10b981" : "#ef4444");">
+                    @result.FinalScore
+                </div>
+                <div style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Sua Nota (Escala 100-1000)</div>
+            </div>
+
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem 2rem;">
+                <div style="font-size: 2.25rem; font-weight: 800; color: #1e3a8a;">
+                    @result.CorrectQuestions / @result.TotalQuestions
+                </div>
+                <div style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Questões Corretas</div>
+            </div>
+
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem 2rem;">
+                <div style="font-size: 2.25rem; font-weight: 800; color: #0078d4;">
+                    @FormatDuration(result.Duration)
+                </div>
+                <div style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Tempo Total Gasto</div>
+            </div>
+        </div>
+
+        @if (stats is not null)
+        {
+            <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 0.85rem 1.25rem; max-width: 550px; margin: 1.5rem auto 0 auto; text-align: center; font-size: 0.9rem; color: #166534;">
+                📈 <strong>Cobertura do Banco Oficial:</strong> Você já passou por <strong>@stats.UniqueQuestionsAnswered</strong> de <strong>@stats.TotalQuestionPool</strong> questões únicas (@Math.Round(((double)stats.UniqueQuestionsAnswered / stats.TotalQuestionPool) * 100, 1)%).
+            </div>
+        }
+    </div>
+
+    <!-- Desempenho por Domínio Oficial -->
+    <div class="card-box">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #1f2937; margin-bottom: 1.5rem;">
+            📊 Desempenho Detalhado por Domínio da Prova
+        </h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            @foreach (var domain in result.DomainScores)
+            {
+                <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem;">
+                        <span>@domain.DomainName (Peso Oficial: @domain.WeightPercent%)</span>
+                        <span style="color: @(domain.Percentage >= 70 ? "#059669" : "#dc2626");">
+                            @domain.Correct de @domain.Total acertos (@domain.Percentage%)
+                        </span>
+                    </div>
+                    <div style="background: #e5e7eb; border-radius: 9999px; height: 10px; overflow: hidden;">
+                        <div style="background: @(domain.Percentage >= 70 ? "#10b981" : (domain.Percentage >= 50 ? "#f59e0b" : "#ef4444")); height: 100%; width: @(domain.Percentage)%;"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Revisão das Questões com Gabarito e Explicações -->
+    <div class="card-box">
+        @{
+            var errorQuestions = result.Reviews.Where(q => !q.IsCorrect).ToList();
+            var correctQuestions = result.Reviews.Where(q => q.IsCorrect).ToList();
+            var displayedReviews = reviewFilter switch
+            {
+                "errors" => errorQuestions,
+                "correct" => correctQuestions,
+                _ => result.Reviews
+            };
+        }
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1.25rem;">
+            <div>
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: #1e293b; margin: 0 0 0.25rem 0;">
+                    🎯 Revisão dos Erros para Estudo
+                </h2>
+                <p style="font-size: 0.9rem; color: #64748b; margin: 0;">
+                    Revise as questões incorretas para compreender os conceitos e diagnósticos oficiais do Microsoft Learn.
+                </p>
+            </div>
+
+            <!-- Filtros de Visualização -->
+            <div style="display: inline-flex; background: #f1f5f9; padding: 0.3rem; border-radius: 8px; border: 1px solid #e2e8f0; gap: 0.35rem; flex-wrap: wrap;">
+                <button type="button"
+                        class="btn btn-sm @(reviewFilter == "errors" ? "btn-primary" : "btn-secondary")"
+                        @onclick='() => reviewFilter = "errors"'
+                        style="box-shadow: none;">
+                    ❌ Apenas Erros (@errorQuestions.Count)
+                </button>
+                <button type="button"
+                        class="btn btn-sm @(reviewFilter == "all" ? "btn-primary" : "btn-secondary")"
+                        @onclick='() => reviewFilter = "all"'
+                        style="box-shadow: none;">
+                    📋 Todas (@result.Reviews.Count)
+                </button>
+                <button type="button"
+                        class="btn btn-sm @(reviewFilter == "correct" ? "btn-primary" : "btn-secondary")"
+                        @onclick='() => reviewFilter = "correct"'
+                        style="box-shadow: none;">
+                    ✅ Apenas Acertos (@correctQuestions.Count)
+                </button>
+            </div>
+        </div>
+
+        @if (displayedReviews.Count == 0)
+        {
+            <div style="text-align: center; padding: 3rem 1.5rem; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; margin-bottom: 1.5rem;">
+                <span style="font-size: 2.5rem;">🎉</span>
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: #166534; margin: 0.75rem 0 0.35rem 0;">
+                    @(reviewFilter == "errors" ? "Excelente! Você não cometeu nenhum erro neste exame." : "Nenhuma questão encontrada para este filtro.")
+                </h3>
+                <p style="color: #15803d; font-size: 0.92rem; margin: 0;">
+                    @(reviewFilter == "errors" ? "Seu desempenho foi de 100% de acertos! Você dominou todos os tópicos avaliados." : "")
+                </p>
+            </div>
+        }
+        else
+        {
+            @foreach (var q in displayedReviews)
+            {
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid @(q.IsCorrect ? "#10b981" : "#ef4444");">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="badge-domain" style="margin-bottom: 0;">@q.DomainName</span>
+                            @if (q.CorrectOptionIds.Count > 1)
+                            {
+                                <span class="badge-type multiple" style="font-size: 0.75rem;">☑️ Múltipla Escolha</span>
+                            }
+                        </div>
+                        <span style="font-weight: 700; font-size: 0.85rem; color: @(q.IsCorrect ? "#059669" : "#dc2626");">
+                            @(q.IsCorrect ? "✅ Correto" : "❌ Incorreto")
+                        </span>
+                    </div>
+
+                    <p style="font-weight: 600; color: #1f2937; margin-bottom: 1rem; font-size: 1rem;">
+                        Questão @q.Number: @q.Statement
+                    </p>
+
+                    <div style="margin-bottom: 1rem;">
+                        @foreach (var opt in q.Options)
+                        {
+                            var wasSelected = q.UserSelectedOptionIds.Contains(opt.Id);
+                            var isCorrect = q.CorrectOptionIds.Contains(opt.Id);
+
+                            var optBorder = "#e5e7eb";
+                            var optBg = "#ffffff";
+                            if (isCorrect && wasSelected) { optBorder = "#10b981"; optBg = "#ecfdf5"; }
+                            else if (isCorrect && !wasSelected) { optBorder = "#f59e0b"; optBg = "#fffbeb"; }
+                            else if (wasSelected && !isCorrect) { optBorder = "#ef4444"; optBg = "#fef2f2"; }
+
+                            <div style="display: flex; gap: 0.65rem; align-items: flex-start; padding: 0.75rem 0.95rem; border: 1.5px solid @optBorder; background-color: @optBg; border-radius: 8px; margin-bottom: 0.5rem; font-size: 0.92rem;">
+                                <span class="option-letter" style="color: #0078d4;">@opt.Letter)</span>
+                                <div class="option-body">
+                                    <div class="option-text">@opt.Text</div>
+                                    @if (isCorrect && wasSelected)
+                                    {
+                                        <div style="margin-top: 0.35rem;">
+                                            <span class="feedback-badge badge-correct">✅ Correta (Você marcou)</span>
+                                        </div>
+                                    }
+                                    else if (isCorrect && !wasSelected)
+                                    {
+                                        <div style="margin-top: 0.35rem;">
+                                            <span class="feedback-badge badge-missed">⚠️ Correta (Não marcada)</span>
+                                        </div>
+                                    }
+                                    else if (wasSelected)
+                                    {
+                                        <div style="margin-top: 0.35rem;">
+                                            <span class="feedback-badge badge-incorrect">❌ Incorreta (Sua opção)</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; font-size: 0.9rem; color: #334155; line-height: 1.5;">
+                        <strong style="color: #0078d4;">💡 Explicação Oficial:</strong> @q.Explanation
+                    </div>
+                </div>
+            }
+        }
+
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-lg" @onclick='() => Nav.NavigateTo("/")'>
+                Fazer Novo Simulado 🔄
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid SessionId { get; set; }
+
+    private bool loading = true;
+    private string reviewFilter = "errors"; // "errors", "all", "correct"
+    private ExamResultDto? result;
+    private ExamStatsDto? stats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        result = await Api.GetResultAsync(SessionId);
+        try
+        {
+            stats = await Api.GetStatsAsync();
+        }
+        catch { }
+        loading = false;
+    }
+
+    private string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+            return $"{(int)duration.TotalHours}h {duration.Minutes}m";
+        return $"{duration.Minutes}m {duration.Seconds}s";
+    }
+}

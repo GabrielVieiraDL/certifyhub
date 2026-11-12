@@ -1,0 +1,30 @@
+@inherits LayoutComponentBase
+
+<div class="page-container">
+    <header class="navbar-header">
+        <a href="/" class="nav-brand" title="Ir para a página inicial do CertifyHub">
+            <span class="brand-badge">AZURE</span>
+            <span class="brand-title">CertifyHub</span>
+            <span class="brand-sub">Simulados Oficiais</span>
+        </a>
+        <nav class="nav-links">
+            <a href="/" class="nav-item">🏠 Início</a>
+            <a href="https://learn.microsoft.com/certifications/exams/az-900/" target="_blank" rel="noopener noreferrer" class="nav-item-link">Microsoft Learn ↗</a>
+        </nav>
+    </header>
+
+    <main class="content-body">
+        @Body
+    </main>
+
+    <footer class="footer-container">
+        <div class="footer-content">
+            <p class="footer-text">CertifyHub — Preparatório para Exames de Certificação Microsoft | Desenvolvido com Blazor, C# e .NET no Azure Ecosystem</p>
+            <p class="footer-subtext">Material de estudo complementar baseado no Microsoft Learn. Marcas registradas pertencem à Microsoft Corp.</p>
+        </div>
+    </footer>
+</div>
+
+<FluentDialogProvider />
+<FluentToastProvider />
+<FluentTooltipProvider />

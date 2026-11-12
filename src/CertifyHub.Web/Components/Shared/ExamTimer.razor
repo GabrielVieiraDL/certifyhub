@@ -1,0 +1,57 @@
+@implements IDisposable
+
+<div style="background: #1e293b; color: white; padding: 0.5rem 1rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; font-family: monospace; font-size: 1.1rem;">
+    <span>⏱️</span>
+    <span style="@(TimeRemaining.TotalMinutes < 5 ? "color: #ef4444; animation: pulse 1s infinite;" : "")">
+        @FormatTime(TimeRemaining)
+    </span>
+</div>
+
+@code {
+    [Parameter] public DateTime? ExpiresAt { get; set; }
+    [Parameter] public EventCallback OnTimeExpired { get; set; }
+
+    private TimeSpan TimeRemaining { get; set; } = TimeSpan.FromMinutes(45);
+    private System.Threading.Timer? _timer;
+
+    protected override void OnInitialized()
+    {
+        UpdateRemainingTime();
+        _timer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(() =>
+            {
+                UpdateRemainingTime();
+                StateHasChanged();
+            });
+        }, null, 0, 1000);
+    }
+
+    private void UpdateRemainingTime()
+    {
+        if (ExpiresAt.HasValue)
+        {
+            var diff = ExpiresAt.Value - DateTime.UtcNow;
+            if (diff <= TimeSpan.Zero)
+            {
+                TimeRemaining = TimeSpan.Zero;
+                _timer?.Dispose();
+                OnTimeExpired.InvokeAsync();
+            }
+            else
+            {
+                TimeRemaining = diff;
+            }
+        }
+    }
+
+    private string FormatTime(TimeSpan span)
+    {
+        return $"{(int)span.TotalMinutes:D2}:{span.Seconds:D2}";
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}
