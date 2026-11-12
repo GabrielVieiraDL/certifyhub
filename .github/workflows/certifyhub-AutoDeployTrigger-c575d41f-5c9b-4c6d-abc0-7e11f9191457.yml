@@ -1,28 +1,45 @@
-name: Trigger auto deployment for certifyhub
+name: Build and Deploy to Azure Container Apps
 
-# When this action will be executed
 on:
-  # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ main ]
-    paths:
-    - '**'
-    - '.github/workflows/certifyhub-AutoDeployTrigger-c575d41f-5c9b-4c6d-abc0-7e11f9191457.yml'
-
-  # Allow manual trigger 
-  workflow_dispatch:      
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions: 
-      id-token: write #This is required for requesting the OIDC JWT Token
-      contents: read #Required when GH token is used to authenticate with private repo
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
     steps:
-      - name: Checkout to the branch
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Convert repository name to lowercase
+        run: |
+          echo "IMAGE_NAME=ghcr.io/$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Azure Login
         uses: azure/login@v2
@@ -31,19 +48,18 @@ jobs:
           tenant-id: ${{ secrets.CERTIFYHUB_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.CERTIFYHUB_AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v2
+      - name: Configure Registry and Update Container App
+        uses: azure/CLI@v2
         with:
-          appSourcePath: ${{ github.workspace }}
-          _dockerfilePathKey_: _dockerfilePath_
-          _targetLabelKey_: _targetLabel_
-          registryUrl: 
-          registryUsername: ${{ secrets.CERTIFYHUB_REGISTRY_USERNAME }}
-          registryPassword: ${{ secrets.CERTIFYHUB_REGISTRY_PASSWORD }}
-          containerAppName: certifyhub
-          resourceGroup: rg-certifyhub
-          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
+          inlineScript: |
+            az containerapp registry set \
+              --name certifyhub \
+              --resource-group rg-certifyhub \
+              --server ghcr.io \
+              --username ${{ github.actor }} \
+              --password ${{ secrets.GITHUB_TOKEN }}
 
-
+            az containerapp update \
+              --name certifyhub \
+              --resource-group rg-certifyhub \
+              --image ${{ env.IMAGE_NAME }}:latest
