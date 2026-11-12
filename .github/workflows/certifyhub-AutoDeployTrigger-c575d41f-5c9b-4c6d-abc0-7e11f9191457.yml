@@ -62,4 +62,5 @@ jobs:
             az containerapp update \
               --name certifyhub \
               --resource-group rg-certifyhub \
-              --image ${{ env.IMAGE_NAME }}:latest
+              --image ${{ env.IMAGE_NAME }}:latest \
+              --target-port 8080

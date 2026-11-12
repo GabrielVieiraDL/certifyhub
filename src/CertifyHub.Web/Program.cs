@@ -62,11 +62,20 @@ app.MapRazorComponents<App>()
 app.MapExamEndpoints();
 app.MapSessionEndpoints();
 
-// Inicialização e Seed do banco SQLite caso ainda não exista
-using (var scope = app.Services.CreateScope())
+// Inicialização e Seed do banco SQLite caso ainda não exista (executado em background para liberar o app.Run() em <1s)
+_ = Task.Run(async () =>
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await SeedData.InitializeAsync(db);
-}
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await SeedData.InitializeAsync(db);
+        Console.WriteLine("[CertifyHub] Banco de dados pronto.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[CertifyHub] Erro na inicialização do banco: {ex.Message}");
+    }
+});
 
 app.Run();

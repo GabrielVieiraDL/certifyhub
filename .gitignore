@@ -10,6 +10,7 @@ obj/
 *.db
 *.db-shm
 *.db-wal
+!src/CertifyHub.Web/certifyhub.db
 
 ## Tools & temporary files
 tools/
