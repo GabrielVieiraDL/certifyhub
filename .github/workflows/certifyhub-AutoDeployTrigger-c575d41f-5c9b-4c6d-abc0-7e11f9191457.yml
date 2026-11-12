@@ -52,6 +52,9 @@ jobs:
         uses: azure/CLI@v2
         with:
           inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az extension add --name containerapp --upgrade --yes
+
             az containerapp registry set \
               --name certifyhub \
               --resource-group rg-certifyhub \
@@ -59,8 +62,14 @@ jobs:
               --username ${{ github.actor }} \
               --password ${{ secrets.GITHUB_TOKEN }}
 
+            az containerapp ingress enable \
+              --name certifyhub \
+              --resource-group rg-certifyhub \
+              --type external \
+              --target-port 8080 \
+              --transport auto
+
             az containerapp update \
               --name certifyhub \
               --resource-group rg-certifyhub \
-              --image ${{ env.IMAGE_NAME }}:latest \
-              --target-port 8080
+              --image ${{ env.IMAGE_NAME }}:latest
